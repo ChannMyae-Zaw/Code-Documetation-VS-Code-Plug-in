@@ -26,6 +26,16 @@
         "command": "code-documentation.sendToBackend",
         "title": "Send To Backend"
       }
+      ,
+      {
+        "command": "code-documentation.acceptChanges",
+        "title": "acceptChanges"
+      }
+      ,
+      {
+        "command": "code-documentation.rejectChanges",
+        "title": "rejectChanges"
+    }
     ]
   },
   "scripts": {

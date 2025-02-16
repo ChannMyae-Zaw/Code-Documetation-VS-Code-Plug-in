@@ -69,54 +69,58 @@ async function processResponse(responseText: string) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) return;
 
-    const originalCode = editor.document.getText(editor.selection);
+    const document = editor.document;
+    const selection = editor.selection;
+
+    if (selection.isEmpty) {
+        vscode.window.showErrorMessage("No code selected.");
+        return;
+    }
+
+    const originalCode = document.getText(); // Get full document text
+    const selectedText = document.getText(selection);
     const modifiedCode = responseText.trim();
 
-    // Compare the original and modified code to see if there's a change
-    if (originalCode === modifiedCode) {
+    if (selectedText === modifiedCode) {
         vscode.window.showInformationMessage("No changes detected.");
         return;
     }
 
-    // Create two virtual documents to display both original and modified code
-    const originalUri = vscode.Uri.parse('untitled:OriginalCode');
-    const modifiedUri = vscode.Uri.parse('untitled:ModifiedCode');
+    // Construct a version of the document with the modified selection
+    const updatedCode =
+        originalCode.substring(0, document.offsetAt(selection.start)) + 
+        modifiedCode + 
+        originalCode.substring(document.offsetAt(selection.end));
 
-    // Write the contents into the virtual documents
-    const originalDoc = await vscode.workspace.openTextDocument(originalUri);
+    // Create virtual document URI for modified content
+    const modifiedUri = vscode.Uri.parse(`untitled:${document.fileName}-modified`);
+
+    // Open the modified document in-memory
     const modifiedDoc = await vscode.workspace.openTextDocument(modifiedUri);
+    const edit = new vscode.WorkspaceEdit();
+    edit.insert(modifiedUri, new vscode.Position(0, 0), updatedCode);
+    await vscode.workspace.applyEdit(edit);
 
-    const originalEdit = new vscode.WorkspaceEdit();
-    originalEdit.insert(originalUri, new vscode.Position(0, 0), originalCode);
-    await vscode.workspace.applyEdit(originalEdit);
+    // Show the diff view with full document context
+    await vscode.commands.executeCommand('vscode.diff', document.uri, modifiedUri, 'Code Changes');
 
-    const modifiedEdit = new vscode.WorkspaceEdit();
-    modifiedEdit.insert(modifiedUri, new vscode.Position(0, 0), modifiedCode);
-    await vscode.workspace.applyEdit(modifiedEdit);
-
-    // Show the diff view (side-by-side comparison)
-    await vscode.commands.executeCommand('vscode.diff', originalUri, modifiedUri, 'Code Changes');
-
-    // Ask user for confirmation to accept or reject changes
-    const userChoice = await vscode.window.showQuickPick(["Accept", "Reject"], {
-        placeHolder: "Do you want to accept the changes?",
+    // Ask the user to accept or reject the changes
+    const result = await vscode.window.showQuickPick(['Accept', 'Reject'], {
+        placeHolder: 'Do you want to accept the changes?',
         ignoreFocusOut: true
     });
 
-    if (userChoice === "Accept") {
-        // Apply the modified code to the active editor if accepted
-        const edit = new vscode.WorkspaceEdit();
-        edit.replace(editor.document.uri, editor.selection, modifiedCode);
-        await vscode.workspace.applyEdit(edit);
+    if (result === 'Accept') {
+        // Apply the changes to the document
+        const applyEdit = new vscode.WorkspaceEdit();
+        applyEdit.replace(editor.document.uri, selection, modifiedCode);
+        await vscode.workspace.applyEdit(applyEdit);
         vscode.window.showInformationMessage("Code updated successfully.");
     } else {
+        // Reject the changes
         vscode.window.showInformationMessage("Code update rejected.");
-        // No changes to the active document (no edit applied)
-        // Optionally, you can do nothing here or restore to original code if needed
     }
 }
-
-
 
 // Step 6: Gather Data and Send to Backend
 async function gatherDataAndSendToBackend() {
