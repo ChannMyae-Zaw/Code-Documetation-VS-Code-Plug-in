@@ -36,7 +36,25 @@
         "command": "code-documentation.rejectChanges",
         "title": "rejectChanges"
     }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar":[
+        {
+          "id": "code-documentation",
+          "title" : "Code Documentation",
+          "icon" : "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "code-documentation": [
+          {   
+              "type": "webview",
+              "id": "code-documentation.primarySidebar",
+              "name": "Primary Sidebar"
+          }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
