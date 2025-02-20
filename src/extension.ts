@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     let disposable = vscode.commands.registerCommand('code-documentation.sendToBackend', async () => {
-        await BackendService.gatherDataAndSendToBackend();
+        await BackendService.gatherDataAndSendToBackend(context);
     });
 
     context.subscriptions.push(disposable);

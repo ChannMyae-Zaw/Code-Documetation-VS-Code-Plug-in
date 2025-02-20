@@ -20,39 +20,36 @@
       {
         "command": "code-documentation.getCode",
         "title": "Get Selected Code"
-      }
-      ,
+      },
       {
         "command": "code-documentation.sendToBackend",
         "title": "Send To Backend"
-      }
-      ,
+      },
       {
         "command": "code-documentation.acceptChanges",
         "title": "acceptChanges"
-      }
-      ,
+      },
       {
         "command": "code-documentation.rejectChanges",
         "title": "rejectChanges"
-    }
+      }
     ],
     "viewsContainers": {
-      "activitybar":[
+      "activitybar": [
         {
           "id": "code-documentation",
-          "title" : "Code Documentation",
-          "icon" : "resources/icon.svg"
+          "title": "Code Documentation",
+          "icon": "src/resources/icon.svg"
         }
       ]
     },
     "views": {
       "code-documentation": [
-          {   
-              "type": "webview",
-              "id": "code-documentation.primarySidebar",
-              "name": "Primary Sidebar"
-          }
+        {
+          "type": "webview",
+          "id": "code-documentation.primarySidebar",
+          "name": "Primary Sidebar"
+        }
       ]
     }
   },
@@ -76,6 +73,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "code-documentation": "file:"
   }
 }
