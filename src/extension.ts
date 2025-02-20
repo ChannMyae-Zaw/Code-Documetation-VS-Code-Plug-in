@@ -3,6 +3,12 @@ import { BackendService } from './services/BackendService';
 import { PrimarySidebar } from './sidebars/PrimarySidebar';
 
 export function activate(context: vscode.ExtensionContext) {
+
+    // Reset global states on each new debug session
+    // Just remove <<< , undefined >>> from the following
+    context.globalState.update('apiKey', undefined);
+    context.globalState.update('documentationFile', undefined);
+    context.globalState.update('documentationFilePath', undefined);
     
     const primarySidebar = new PrimarySidebar(context);
 
