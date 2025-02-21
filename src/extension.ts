@@ -6,9 +6,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Reset global states on each new debug session
     // Just remove the following lines if resetting is not needed
-    context.globalState.update('apiKey', undefined);
-    context.globalState.update('documentationFile', undefined);
-    context.globalState.update('documentationFilePath', undefined);
+    //context.globalState.update('apiKey', undefined);
+    //context.globalState.update('documentationFile', undefined);
+    //context.globalState.update('documentationFilePath', undefined);
     
     const primarySidebar = new PrimarySidebar(context);
 
