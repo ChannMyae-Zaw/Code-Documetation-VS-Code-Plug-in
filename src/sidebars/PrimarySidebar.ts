@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { BackendService } from '../services/BackendService';
+import * as fs from 'fs';
 
 export class PrimarySidebar implements vscode.WebviewViewProvider {
     public static readonly viewType = 'code-documentation.primarySidebar';
@@ -41,22 +41,70 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
             switch (message.type) {
                 case 'getSettings':
                     webviewView.webview.postMessage({
-                        type: 'loadSettings',
-                        apiKey,
-                        documentationFile,
-                        documentationFilePath
+                    type: 'loadSettings',
+                    apiKey: this.context.globalState.get('apiKey'),
+                    documentationFile: this.context.globalState.get('documentationFile'),
+                    documentationFilePath: this.context.globalState.get('documentationFilePath')
                     });
                     break;
+
+                case 'handleFileUpload':
+                    try {
+                        // Create a directory for storing uploaded files if it doesn't exist
+                        const storageDir = path.join(this.context.globalStorageUri.fsPath, 'uploads');
+                        if (!fs.existsSync(storageDir)) {
+                            fs.mkdirSync(storageDir, { recursive: true });
+                        }
     
-                case 'saveSettings':
-                    await this.context.globalState.update('apiKey', message.apiKey);
-                    await this.context.globalState.update('documentationFile', message.documentationFile);
-                    await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
-                    vscode.window.showInformationMessage('Settings saved successfully!');
+                        // Save the file
+                        const filePath = path.join(storageDir, message.fileName);
+                        fs.writeFileSync(filePath, Buffer.from(message.fileContent));
+    
+                        // Update the file path in the webview
+                        webviewView.webview.postMessage({
+                            type: 'loadSettings',
+                            apiKey: this.context.globalState.get('apiKey'),
+                            documentationFile: message.fileName,
+                            documentationFilePath: filePath
+                        });
+    
+                        vscode.window.showInformationMessage(`File saved successfully: ${message.fileName}`);
+                    } catch (error) {
+                        console.error('Error handling file upload:', error);
+                        if (error instanceof Error) {
+                            vscode.window.showErrorMessage(`Failed to save file: ${error.message}`);
+                        } else {
+                            vscode.window.showErrorMessage('Failed to save file: Unknown error');
+                        }
+                    }
                     break;
-            }
-        });
-    }
+    
+                    case 'saveSettings':
+                        try {
+                            await this.context.globalState.update('apiKey', message.apiKey);
+                            await this.context.globalState.update('documentationFile', message.documentationFile);
+                            await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
+    
+                            const savedPath = this.context.globalState.get('documentationFilePath');
+                            console.log("Saved documentation file path:", savedPath);
+    
+                            if (savedPath && typeof savedPath === 'string' && !fs.existsSync(savedPath)) {
+                                throw new Error(`File not found at path: ${savedPath}`);
+                            }
+    
+                            vscode.window.showInformationMessage('Settings saved successfully!');
+                        } catch (error) {
+                            console.error('Error saving settings:', error);
+                            if (error instanceof Error) {
+                                vscode.window.showErrorMessage(`Failed to save settings: ${error.message}`);
+                            } else {
+                                vscode.window.showErrorMessage('Failed to save settings: Unknown error');
+                            }
+                        }
+                        break;
+                }
+            });
+        }
 
     private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri): string {
         return `

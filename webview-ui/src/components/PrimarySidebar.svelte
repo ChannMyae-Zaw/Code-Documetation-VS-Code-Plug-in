@@ -10,21 +10,32 @@
     onMount(() => {
         window.addEventListener("message", (event) => {
             const message = event.data;
-            if (message.type === 'loadSettings') {  // Changed from command to type
+            if (message.type === 'loadSettings') {
                 apiKey = message.apiKey || '';
                 fileName = message.documentationFile || '';
                 filePath = message.documentationFilePath || '';
             }
         });
 
-        vscode.postMessage({ type: 'getSettings' });  // Changed from command to type
+        vscode.postMessage({ type: 'getSettings' });
     });
 
-    function handleFileUpload(event) {
+    async function handleFileUpload(event) {
         file = event.target.files[0];
-        fileName = file ? file.name : '';
-        // In a real implementation, you'd need to handle the file path
-        // This might require additional VS Code API integration
+        if (file) {
+            fileName = file.name;
+            
+            // Read file and send to VS Code
+            const reader = new FileReader();
+            reader.onload = async () => {
+                vscode.postMessage({
+                    type: 'handleFileUpload',
+                    fileContent: reader.result,
+                    fileName: fileName
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
     }
 
     function saveSettings() {
@@ -34,7 +45,7 @@
         }
 
         vscode.postMessage({
-            type: 'saveSettings',  // Changed from command to type
+            type: 'saveSettings',
             apiKey,
             documentationFile: fileName,
             documentationFilePath: filePath
