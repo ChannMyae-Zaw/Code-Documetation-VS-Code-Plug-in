@@ -38,6 +38,10 @@
         }
     }
 
+    function deleteFile() {
+        vscode.postMessage({ type: 'deleteFile' });
+    }
+
     function saveSettings() {
         if (!apiKey) {
             alert("Please enter an API key.");
@@ -67,7 +71,6 @@
         margin-bottom: 0.5rem;
     }
     .input-wrapper {
-        padding: auto;
         width: 100%;
     }
     input {
@@ -115,10 +118,13 @@
     .file-upload-button:hover {
         background-color: var(--vscode-button-hoverBackground);
     }
-    .file-name {
+    .delete-button {
         margin-top: 0.5rem;
-        font-size: 0.9em;
-        color: var(--vscode-foreground);
+        background-color: var(--vscode-errorForeground, #f44336);
+    }
+    .delete-button:hover {
+        background-color: var(--vscode-errorForeground, #d32f2f);
+        opacity: 0.9;
     }
 </style>
 
@@ -147,6 +153,11 @@
                 {fileName ? fileName : 'Choose PDF File'}
             </div>
         </div>
+        {#if fileName}
+            <button class="delete-button" on:click={deleteFile}>
+                Delete File
+            </button>
+        {/if}
     </div>
 
     <button on:click={saveSettings}>Save Settings</button>

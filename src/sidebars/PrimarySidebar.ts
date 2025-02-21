@@ -41,10 +41,10 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
             switch (message.type) {
                 case 'getSettings':
                     webviewView.webview.postMessage({
-                    type: 'loadSettings',
-                    apiKey: this.context.globalState.get('apiKey'),
-                    documentationFile: this.context.globalState.get('documentationFile'),
-                    documentationFilePath: this.context.globalState.get('documentationFilePath')
+                        type: 'loadSettings',
+                        apiKey: this.context.globalState.get('apiKey'),
+                        documentationFile: this.context.globalState.get('documentationFile'),
+                        documentationFilePath: this.context.globalState.get('documentationFilePath')
                     });
                     break;
 
@@ -61,6 +61,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         fs.writeFileSync(filePath, Buffer.from(message.fileContent));
     
                         // Update the file path in the webview
+                        await this.context.globalState.update('documentationFile', message.fileName);
+                        await this.context.globalState.update('documentationFilePath', filePath);
+
                         webviewView.webview.postMessage({
                             type: 'loadSettings',
                             apiKey: this.context.globalState.get('apiKey'),
@@ -78,33 +81,60 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         }
                     }
                     break;
-    
-                    case 'saveSettings':
-                        try {
-                            await this.context.globalState.update('apiKey', message.apiKey);
-                            await this.context.globalState.update('documentationFile', message.documentationFile);
-                            await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
-    
-                            const savedPath = this.context.globalState.get('documentationFilePath');
-                            console.log("Saved documentation file path:", savedPath);
-    
-                            if (savedPath && typeof savedPath === 'string' && !fs.existsSync(savedPath)) {
-                                throw new Error(`File not found at path: ${savedPath}`);
-                            }
-    
-                            vscode.window.showInformationMessage('Settings saved successfully!');
-                        } catch (error) {
-                            console.error('Error saving settings:', error);
-                            if (error instanceof Error) {
-                                vscode.window.showErrorMessage(`Failed to save settings: ${error.message}`);
-                            } else {
-                                vscode.window.showErrorMessage('Failed to save settings: Unknown error');
-                            }
+
+                case 'deleteFile':
+                    try {
+                        const filePath = this.context.globalState.get<string>('documentationFilePath');
+                        if (filePath && fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                            await this.context.globalState.update('documentationFile', '');
+                            await this.context.globalState.update('documentationFilePath', '');
+                            
+                            webviewView.webview.postMessage({
+                                type: 'loadSettings',
+                                apiKey: this.context.globalState.get('apiKey'),
+                                documentationFile: '',
+                                documentationFilePath: ''
+                            });
+                            
+                            vscode.window.showInformationMessage('File deleted successfully');
                         }
-                        break;
-                }
-            });
-        }
+                    } catch (error) {
+                        console.error('Error deleting file:', error);
+                        if (error instanceof Error) {
+                            vscode.window.showErrorMessage(`Failed to delete file: ${error.message}`);
+                        } else {
+                            vscode.window.showErrorMessage('Failed to delete file: Unknown error');
+                        }
+                    }
+                    break;
+    
+                case 'saveSettings':
+                    try {
+                        await this.context.globalState.update('apiKey', message.apiKey);
+                        await this.context.globalState.update('documentationFile', message.documentationFile);
+                        await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
+    
+                        const savedPath = this.context.globalState.get('documentationFilePath');
+                        console.log("Saved documentation file path:", savedPath);
+    
+                        if (savedPath && typeof savedPath === 'string' && !fs.existsSync(savedPath)) {
+                            throw new Error(`File not found at path: ${savedPath}`);
+                        }
+    
+                        vscode.window.showInformationMessage('Settings saved successfully!');
+                    } catch (error) {
+                        console.error('Error saving settings:', error);
+                        if (error instanceof Error) {
+                            vscode.window.showErrorMessage(`Failed to save settings: ${error.message}`);
+                        } else {
+                            vscode.window.showErrorMessage('Failed to save settings: Unknown error');
+                        }
+                    }
+                    break;
+            }
+        });
+    }
 
     private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri): string {
         return `
