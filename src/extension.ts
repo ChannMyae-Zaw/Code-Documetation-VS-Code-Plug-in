@@ -4,6 +4,12 @@ import { PrimarySidebar } from './sidebars/PrimarySidebar';
 import { SecondarySidebar } from './sidebars/SecondarySidebar';
 
 export function activate(context: vscode.ExtensionContext) {
+
+    // Reset global states on each new debug session
+    // Just remove the following lines if resetting is not needed
+    //context.globalState.update('apiKey', undefined);
+    //context.globalState.update('documentationFile', undefined);
+    //context.globalState.update('documentationFilePath', undefined);
     
     const primarySidebar = new PrimarySidebar(context);
 
@@ -23,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     let disposable = vscode.commands.registerCommand('code-documentation.sendToBackend', async () => {
-        await BackendService.gatherDataAndSendToBackend();
+        await BackendService.gatherDataAndSendToBackend(context);
     });
 
     context.subscriptions.push(disposable);
