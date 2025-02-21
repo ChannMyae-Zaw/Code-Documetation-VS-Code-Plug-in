@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { BackendService } from './services/BackendService';
 import { PrimarySidebar } from './sidebars/PrimarySidebar';
+import { SecondarySidebar } from './sidebars/SecondarySidebar';
 
 export function activate(context: vscode.ExtensionContext) {
     
@@ -10,6 +11,14 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.registerWebviewViewProvider(
             PrimarySidebar.viewType, 
             primarySidebar
+        )
+    );
+
+    const secondarySidebar = new SecondarySidebar(context);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+            SecondarySidebar.viewType,
+            secondarySidebar
         )
     );
 

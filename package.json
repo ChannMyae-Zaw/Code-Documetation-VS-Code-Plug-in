@@ -52,6 +52,12 @@
               "type": "webview",
               "id": "code-documentation.primarySidebar",
               "name": "Primary Sidebar"
+          },
+          {
+              "type": "webview",
+              "id": "code-documentation.secondarySidebar",
+              "name": "Secondary Sidebar",
+              "when": "code-documentation.showSecondarySidebar"
           }
       ]
     }

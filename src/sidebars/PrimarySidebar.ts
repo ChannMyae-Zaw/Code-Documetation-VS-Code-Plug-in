@@ -29,6 +29,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
 
         // Load the Svelte app HTML and link the JS and CSS
         webviewView.webview.html = this.getHtmlContent(svelteAppUri, svelteAppUriJS, svelteAppUriCSS);
+        setTimeout(() => {
+            webviewView.webview.postMessage({ type: "setSidebar", sidebar: "primary" });
+        }, 100);
     }
 
     private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri): string {

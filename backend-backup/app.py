@@ -114,19 +114,19 @@ def get_openai_response(prompt: str, user_api_key: str):
     try:
         client = OpenAI(api_key=user_api_key)
         
+        #response = client.chat.completions.create(
+        #    model="gpt-4",
+        #    messages=[{"role": "system", "content": "You only generate raw code output."},
+        #             {"role": "user", "content": prompt}],
+        #   temperature=0,
+        #)
+
         response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "system", "content": "You only generate raw code output."},
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You must return only raw code output. No explanations, no markdown, no HTML, and no surrounding text."},
                       {"role": "user", "content": prompt}],
             temperature=0,
         )
-
-        #response = client.chat.completions.create(
-        #    model="gpt-3.5-turbo",
-        #    messages=[{"role": "system", "content": "You must return only raw code output. No explanations, no markdown, no HTML, and no surrounding text."},
-        #              {"role": "user", "content": prompt}],
-        #    temperature=0,
-        #)
         return response.choices[0].message.content
     except Exception as e:
         if 'invalid api key' in str(e).lower():

@@ -31,6 +31,8 @@ export class DiffService {
 
         // Show diff view
         await vscode.commands.executeCommand('vscode.diff', document.uri, modifiedUri, 'Code Changes');
+        await vscode.commands.executeCommand('setContext', 'code-documentation.showSecondarySidebar', true);
+
 
         // Prompt user for action
         const result = await vscode.window.showQuickPick(['Accept', 'Reject'], {
@@ -46,5 +48,9 @@ export class DiffService {
         } else {
             vscode.window.showInformationMessage("Code update rejected.");
         }
+        await vscode.commands.executeCommand('workbench.action.closeActiveEditor'); 
+
+        // Close the secondary sidebar
+        await vscode.commands.executeCommand('setContext', 'code-documentation.showSecondarySidebar', false);
     }
 }
