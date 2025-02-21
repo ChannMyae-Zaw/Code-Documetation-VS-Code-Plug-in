@@ -66,27 +66,66 @@
         display: block;
         margin-bottom: 0.5rem;
     }
+    .input-wrapper {
+        padding: auto;
+        width: 100%;
+    }
     input {
-        width: 80%;
+        width: 100%;
         padding: 0.5rem;
         margin-bottom: 1rem;
+        box-sizing: border-box;
     }
     button {
+        width: 100%;
         padding: 0.5rem;
         background-color: var(--vscode-button-background);
         color: var(--vscode-button-foreground);
         border: none;
         cursor: pointer;
+        box-sizing: border-box;
     }
     button:hover {
         background-color: var(--vscode-button-hoverBackground);
+    }
+    .file-upload {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+    .file-upload-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .file-upload-button {
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        background-color: var(--vscode-button-background);
+        color: var(--vscode-button-foreground);
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    .file-upload-button:hover {
+        background-color: var(--vscode-button-hoverBackground);
+    }
+    .file-name {
+        margin-top: 0.5rem;
+        font-size: 0.9em;
+        color: var(--vscode-foreground);
     }
 </style>
 
 <div class="container">
     <h2>Athena Profile Settings</h2>
     
-    <div>
+    <div class="input-wrapper">
         <label for="apiKey">OpenAI API Key:</label>
         <input 
             id="apiKey"
@@ -95,17 +134,19 @@
         />
     </div>
 
-    <div>
-        <label for="fileUpload">Upload Coding Standard (PDF):</label>
-        <input 
-            id="fileUpload"
-            type="file" 
-            accept=".pdf" 
-            on:change={handleFileUpload} 
-        />
-        {#if fileName}
-            <p class="file-name">Selected: {fileName}</p>
-        {/if}
+    <div class="input-wrapper">
+        <label>Upload Coding Standard (PDF):</label>
+        <div class="file-upload">
+            <input 
+                class="file-upload-input"
+                type="file" 
+                accept=".pdf" 
+                on:change={handleFileUpload} 
+            />
+            <div class="file-upload-button">
+                {fileName ? fileName : 'Choose PDF File'}
+            </div>
+        </div>
     </div>
 
     <button on:click={saveSettings}>Save Settings</button>
