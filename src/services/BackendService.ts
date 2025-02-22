@@ -17,6 +17,8 @@ export class BackendService {
         // Get settings from globalState!!!
         const apiKey = context.globalState.get<string>('apiKey');
         const documentationFilePath = context.globalState.get<string>('documentationFilePath');
+        const detailLevel = context.globalState.get<string>('detailLevel') || 'Basic';
+
         
         if (!apiKey) {
             vscode.window.showErrorMessage("API key is not set. Please configure it in the Primary Sidebar.");
@@ -28,9 +30,6 @@ export class BackendService {
             vscode.window.showErrorMessage("Documentation file not found. Please upload a file in the Primary Sidebar.");
             return;
         }
-
-        const detailLevel = await InputUtils.getDetailLevelFromUser();
-        if (!detailLevel) return;
 
         // Prepare request data
         const formData = new FormData();

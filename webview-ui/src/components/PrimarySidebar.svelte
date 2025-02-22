@@ -4,6 +4,7 @@
     let file = null;
     let fileName = '';
     let filePath = '';
+    let detailLevel = 'Basic'; //by default
 
     const vscode = acquireVsCodeApi();
 
@@ -14,11 +15,16 @@
                 apiKey = message.apiKey || '';
                 fileName = message.documentationFile || '';
                 filePath = message.documentationFilePath || '';
+                detailLevel = message.detailLevel || 'Basic'; //load the default level
             }
         });
 
         vscode.postMessage({ type: 'getSettings' });
     });
+
+    function sendToBackend() {
+        vscode.postMessage({ type: 'sendToBackend' });
+    }
 
     async function handleFileUpload(event) {
         file = event.target.files[0];
@@ -52,7 +58,8 @@
             type: 'saveSettings',
             apiKey,
             documentationFile: fileName,
-            documentationFilePath: filePath
+            documentationFilePath: filePath,
+            detailLevel
         });
     }
 </script>
@@ -65,6 +72,14 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        height: 95vh;
+    }
+    .content {
+        flex: 1;
+        overflow-y: auto; 
+    }
+    .footer {
+        margin-top: auto;
     }
     label {
         display: block;
@@ -73,11 +88,21 @@
     .input-wrapper {
         width: 100%;
     }
-    input {
+    input, select {
         width: 100%;
         padding: 0.5rem;
         margin-bottom: 1rem;
         box-sizing: border-box;
+    }
+    select { 
+        background-color: var(--vscode-button-background);
+        color: var(--vscode-button-foreground);
+        border: none;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    select:hover {
+        //background-color: var(--vscode-button-foreground);
     }
     button {
         width: 100%;
@@ -130,35 +155,50 @@
 
 <div class="container">
     <h2>Athena Profile Settings</h2>
-    
-    <div class="input-wrapper">
-        <label for="apiKey">OpenAI API Key:</label>
-        <input 
-            id="apiKey"
-            bind:value={apiKey} 
-            placeholder="Enter your API key" 
-        />
-    </div>
 
-    <div class="input-wrapper">
-        <label>Upload Coding Standard (PDF):</label>
-        <div class="file-upload">
+    <div class="content">    
+        <div class="input-wrapper">
+            <label for="apiKey">OpenAI API Key:</label>
             <input 
-                class="file-upload-input"
-                type="file" 
-                accept=".pdf" 
-                on:change={handleFileUpload} 
+                id="apiKey"
+                bind:value={apiKey} 
+                placeholder="Enter your API key" 
             />
-            <div class="file-upload-button">
-                {fileName ? fileName : 'Choose PDF File'}
-            </div>
         </div>
-        {#if fileName}
-            <button class="delete-button" on:click={deleteFile}>
-                Delete File
-            </button>
-        {/if}
+
+        <div class="input-wrapper">
+            <label>Upload Coding Standard (PDF):</label>
+            <div class="file-upload">
+                <input 
+                    class="file-upload-input"
+                    type="file" 
+                    accept=".pdf" 
+                    on:change={handleFileUpload} 
+                />
+                <div class="file-upload-button">
+                    {fileName ? fileName : 'Choose PDF File'}
+                </div>
+            </div>
+            {#if fileName}
+                <button class="delete-button" on:click={deleteFile}>
+                    Delete File
+                </button>
+            {/if}
+        </div>
+
+        <div class="input-wrapper">
+            <label for="detailLevel">Detail Level:</label>
+            <select id="detailLevel" bind:value={detailLevel}>
+                <option value="Basic">Basic</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+        </div>
+
+        <button on:click={saveSettings}>Save Settings</button>
     </div>
 
-    <button on:click={saveSettings}>Save Settings</button>
+    <div class="footer">
+        <button on:click={sendToBackend}>Generate Documentation</button>
+    </div>
 </div>

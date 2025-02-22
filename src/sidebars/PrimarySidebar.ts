@@ -44,7 +44,8 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         type: 'loadSettings',
                         apiKey: this.context.globalState.get('apiKey'),
                         documentationFile: this.context.globalState.get('documentationFile'),
-                        documentationFilePath: this.context.globalState.get('documentationFilePath')
+                        documentationFilePath: this.context.globalState.get('documentationFilePath'),
+                        detailLevel: this.context.globalState.get('detailLevel') || 'Basic'
                     });
                     break;
 
@@ -114,7 +115,8 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         await this.context.globalState.update('apiKey', message.apiKey);
                         await this.context.globalState.update('documentationFile', message.documentationFile);
                         await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
-    
+                        await this.context.globalState.update('detailLevel', message.detailLevel); 
+
                         const savedPath = this.context.globalState.get('documentationFilePath');
                         console.log("Saved documentation file path:", savedPath);
     
@@ -131,6 +133,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                             vscode.window.showErrorMessage('Failed to save settings: Unknown error');
                         }
                     }
+                    break;
+                case 'sendToBackend':
+                    vscode.commands.executeCommand('code-documentation.sendToBackend');
                     break;
             }
         });
