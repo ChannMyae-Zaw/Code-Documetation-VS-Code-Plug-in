@@ -25,13 +25,13 @@ export class SecondarySidebar implements vscode.WebviewViewProvider {
         );
 
         // Load the Svelte app HTML and link the JS and CSS
-        webviewView.webview.html = this.getHtmlContent(svelteAppUri, svelteAppUriJS, svelteAppUriCSS);
+        webviewView.webview.html = this.getHtmlContent(svelteAppUri, svelteAppUriJS, svelteAppUriCSS, 'secondary');
         setTimeout(() => {
             webviewView.webview.postMessage({ type: "setSidebar", sidebar: "secondary" });
         }, 100);
     }
 
-        private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri): string {
+        private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri, sidebartype: string): string {
             return `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -43,6 +43,9 @@ export class SecondarySidebar implements vscode.WebviewViewProvider {
                 </head>
                 <body>
                     <div id="svelte-root"></div>
+                    <script>
+                    window.sidebarType = "secondary"; // ✅ Inject as a global variable
+                    </script>
                     <script src="${svelteAppUriJS}"></script>
                 </body>
                 </html>

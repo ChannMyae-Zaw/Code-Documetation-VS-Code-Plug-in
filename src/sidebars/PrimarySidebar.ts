@@ -34,7 +34,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
         );
     
         // Load the Svelte app and send saved data
-        webviewView.webview.html = this.getHtmlContent(svelteAppUri, svelteAppUriJS, svelteAppUriCSS);
+        webviewView.webview.html = this.getHtmlContent(svelteAppUri, svelteAppUriJS, svelteAppUriCSS, 'primary');
     
         // Send saved settings to Svelte on Webview load
         webviewView.webview.onDidReceiveMessage(async message => {
@@ -134,12 +134,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                     break;
             }
         });
-        setTimeout(() => {
-            webviewView.webview.postMessage({ type: "setSidebar", sidebar: "primary" });
-        }, 100);
     }
 
-    private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri): string {
+    private getHtmlContent(svelteAppUri: vscode.Uri, svelteAppUriJS: vscode.Uri, svelteAppUriCSS: vscode.Uri, sidebarType: string): string {
         return `
             <!DOCTYPE html>
             <html lang="en">
@@ -151,6 +148,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
             </head>
             <body>
                 <div id="svelte-root"></div>
+                <script>
+                window.sidebarType = "primary"; // ✅ Inject as a global variable
+                </script>
                 <script src="${svelteAppUriJS}"></script>
             </body>
             </html>
