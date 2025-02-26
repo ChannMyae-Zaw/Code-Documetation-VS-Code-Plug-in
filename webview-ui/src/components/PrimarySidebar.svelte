@@ -80,6 +80,8 @@
     }
     .footer {
         margin-top: auto;
+        display: flex;
+        justify-content: space-between;
     }
     label {
         display: block;
@@ -95,14 +97,11 @@
         box-sizing: border-box;
     }
     select { 
-        background-color: var(--vscode-button-background);
-        color: var(--vscode-button-foreground);
+        background-color: var(--vscode-button-foreground);
+        color: var(--vscode-editor-background);
         border: none;
         cursor: pointer;
         box-sizing: border-box;
-    }
-    select:hover {
-        //background-color: var(--vscode-button-foreground);
     }
     button {
         width: 100%;
@@ -118,8 +117,8 @@
     }
     .file-upload {
         position: relative;
-        display: block;
-        width: 100%;
+        flex-grow: 1;
+        margin-bottom: 1rem;
     }
     .file-upload-input {
         position: absolute;
@@ -130,26 +129,34 @@
         z-index: 2;
     }
     .file-upload-button {
-        display: block;
+        display: inline-block;
         width: 100%;
         padding: 0.5rem;
-        background-color: var(--vscode-button-background);
-        color: var(--vscode-button-foreground);
+        background-color: var(--vscode-button-foreground);
+        color: var(--vscode-editor-background);
         border: none;
         cursor: pointer;
         text-align: center;
         box-sizing: border-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .file-upload-button:hover {
         background-color: var(--vscode-button-hoverBackground);
     }
     .delete-button {
-        margin-top: 0.5rem;
+        width: 100%;
+        padding: 0.5rem;
+        box-sizing: border-box;
         background-color: var(--vscode-errorForeground, #f44336);
     }
     .delete-button:hover {
         background-color: var(--vscode-errorForeground, #d32f2f);
         opacity: 0.9;
+    }
+    .key-value {
+        color: var(--vscode-editor-background);
     }
 </style>
 
@@ -159,7 +166,8 @@
     <div class="content">    
         <div class="input-wrapper">
             <label for="apiKey">OpenAI API Key:</label>
-            <input 
+            <input
+                class="key-value" 
                 id="apiKey"
                 bind:value={apiKey} 
                 placeholder="Enter your API key" 
@@ -168,22 +176,22 @@
 
         <div class="input-wrapper">
             <label>Upload Coding Standard (PDF):</label>
-            <div class="file-upload">
-                <input 
-                    class="file-upload-input"
-                    type="file" 
-                    accept=".pdf" 
-                    on:change={handleFileUpload} 
-                />
-                <div class="file-upload-button">
-                    {fileName ? fileName : 'Choose PDF File'}
+                <div class="file-upload">
+                    <input 
+                        class="file-upload-input"
+                        type="file" 
+                        accept=".pdf" 
+                        on:change={handleFileUpload} 
+                    />
+                    <div class="file-upload-button">
+                        {fileName ? fileName : 'Choose PDF File'}
+                    </div>
                 </div>
-            </div>
-            {#if fileName}
-                <button class="delete-button" on:click={deleteFile}>
-                    Delete File
-                </button>
-            {/if}
+                {#if fileName}
+                    <button class="delete-button" on:click={deleteFile}>
+                        Delete
+                    </button>
+                {/if}
         </div>
 
         <div class="input-wrapper">
@@ -194,11 +202,10 @@
                 <option value="Advanced">Advanced</option>
             </select>
         </div>
+    <button on:click={saveSettings}>Save Settings</button>
+</div>
 
-        <button on:click={saveSettings}>Save Settings</button>
-    </div>
-
-    <div class="footer">
+<div class="footer">
         <button on:click={sendToBackend}>Generate Documentation</button>
     </div>
 </div>
