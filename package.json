@@ -55,6 +55,7 @@
               "id": "code-documentation.secondarySidebar",
               "name": "Secondary Sidebar",
               "when": "code-documentation.showSecondarySidebar"
+              
           }
       ]
     }
