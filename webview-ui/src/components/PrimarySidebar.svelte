@@ -4,7 +4,7 @@
     let file = null;
     let fileName = '';
     let filePath = '';
-    let detailLevel = 'Basic'; //by default
+    let detailLevel = 'Basic';
 
     const vscode = acquireVsCodeApi();
 
@@ -15,7 +15,7 @@
                 apiKey = message.apiKey || '';
                 fileName = message.documentationFile || '';
                 filePath = message.documentationFilePath || '';
-                detailLevel = message.detailLevel || 'Basic'; //load the default level
+                detailLevel = message.detailLevel || 'Basic';
             }
         });
 
@@ -30,8 +30,7 @@
         file = event.target.files[0];
         if (file) {
             fileName = file.name;
-            
-            // Read file and send to VS Code
+
             const reader = new FileReader();
             reader.onload = async () => {
                 vscode.postMessage({
@@ -46,6 +45,7 @@
 
     function deleteFile() {
         vscode.postMessage({ type: 'deleteFile' });
+        document.getElementById('fileInput').value = '';
     }
 
     function saveSettings() {
@@ -66,146 +66,170 @@
 
 <style>
     :global(body) {
-        padding: 1rem;
+        padding: 0.5rem;
+        font-family: var(--vscode-font-family);
     }
+
     .container {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.5rem;
         height: 95vh;
+        padding: 0.5rem;
+        border-radius: 10px;
+        background-color: #1B263B;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden; 
     }
-    .content {
-        flex: 1;
-        overflow-y: auto; 
+
+
+    h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        background: linear-gradient(90deg, #4EA8DE, #80ED99);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 1.5rem;
     }
-    .footer {
-        margin-top: auto;
-        display: flex;
-        justify-content: space-between;
-    }
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-    .input-wrapper {
+
+    .input-wrapper input {
         width: 100%;
+        padding: 0.6rem;
+        margin-top: 0.2rem;
+        border-radius: 5px;
+        border: none;
+        background-color: #0D1B2A;
+        color: #E0E1DD;
+        box-sizing: border-box;
     }
+
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem; 
+    }
+
+    .input-wrapper label {
+        font-weight: bold;
+        margin-bottom: 0.5rem; 
+    }
+
     input, select {
         width: 100%;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        box-sizing: border-box;
-    }
-    select { 
-        background-color: var(--vscode-button-foreground);
-        color: var(--vscode-editor-background);
+        padding: 0.6rem;
+        border-radius: 5px;
         border: none;
-        cursor: pointer;
-        box-sizing: border-box;
+        background-color: #0D1B2A;
+        color: #E0E1DD;
     }
-    button {
-        width: 100%;
-        padding: 0.5rem;
-        background-color: var(--vscode-button-background);
-        color: var(--vscode-button-foreground);
+
+
+    .upload-button, .delete-button, .save-button, .generate-button {
+        padding: 0.7rem;
+        border-radius: 5px;
         border: none;
-        cursor: pointer;
-        box-sizing: border-box;
-    }
-    button:hover {
-        background-color: var(--vscode-button-hoverBackground);
-    }
-    .file-upload {
-        position: relative;
-        flex-grow: 1;
-        margin-bottom: 1rem;
-    }
-    .file-upload-input {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-        z-index: 2;
-    }
-    .file-upload-button {
-        display: inline-block;
-        width: 100%;
-        padding: 0.5rem;
-        background-color: var(--vscode-button-foreground);
-        color: var(--vscode-editor-background);
-        border: none;
+        font-weight: bold;
         cursor: pointer;
         text-align: center;
-        box-sizing: border-box;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        transition: background 0.3s ease-in-out;
     }
-    .file-upload-button:hover {
-        background-color: var(--vscode-button-hoverBackground);
-    }
-    .delete-button {
+
+    .save-button {
         width: 100%;
-        padding: 0.5rem;
-        box-sizing: border-box;
-        background-color: var(--vscode-errorForeground, #f44336);
+        background: linear-gradient(90deg, #4EA8DE, #80ED99);
+        color: white;
     }
+
+    .save-button:hover {
+        opacity: 0.8;
+    }
+
+    .footer {
+        margin-top: auto; 
+    }
+
+    .generate-button {
+        width: 100%;
+        background: #4EA8DE;
+        color: white;
+    }
+
+    .generate-button:hover {
+        background: #3B82F6;
+    }
+
+    .file-upload-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .file-name-display {
+        flex: 1;
+        padding: 0.6rem;
+        background: transparent;
+        color: #E0E1DD;
+        font-size: 1rem;
+        outline: none;
+        border-bottom: 2px solid #4EA8DE;
+        cursor: pointer;
+    }
+
+    .upload-button {
+        background: linear-gradient(90deg, #4EA8DE, #80ED99);
+        color: white;
+    }
+
+    .delete-button {
+        background: #F44336;
+        color: white;
+    }
+
     .delete-button:hover {
-        background-color: var(--vscode-errorForeground, #d32f2f);
-        opacity: 0.9;
+        background: #D32F2F;
     }
-    .key-value {
-        color: var(--vscode-editor-background);
+
+    .hidden-file-input {
+        display: none;
     }
 </style>
 
 <div class="container">
-    <h2>Athena Profile Settings</h2>
+    <h2>Athena Settings</h2>
 
-    <div class="content">    
-        <div class="input-wrapper">
-            <label for="apiKey">OpenAI API Key:</label>
-            <input
-                class="key-value" 
-                id="apiKey"
-                bind:value={apiKey} 
-                placeholder="Enter your API key" 
-            />
+    <div class="input-wrapper">
+        <label for="apiKey">OpenAI API Key:</label>
+        <input id="apiKey" bind:value={apiKey} placeholder="Enter your API key" />
+    </div>
+
+    <div class="input-wrapper">
+        <label>Upload Coding Standard (PDF):</label>
+        <div class="file-upload-wrapper">
+            <input class="file-name-display" type="text" readonly bind:value={fileName} />
+            {#if !fileName}
+                <button class="upload-button" on:click={() => document.getElementById('fileInput').click()}>Upload</button>
+            {/if}
+            {#if fileName}
+                <button class="delete-button" on:click={deleteFile}>Delete</button>
+            {/if}
+            <input id="fileInput" class="hidden-file-input" type="file" accept=".pdf" on:change={handleFileUpload} />
         </div>
+    </div>
 
-        <div class="input-wrapper">
-            <label>Upload Coding Standard (PDF):</label>
-                <div class="file-upload">
-                    <input 
-                        class="file-upload-input"
-                        type="file" 
-                        accept=".pdf" 
-                        on:change={handleFileUpload} 
-                    />
-                    <div class="file-upload-button">
-                        {fileName ? fileName : 'Choose PDF File'}
-                    </div>
-                </div>
-                {#if fileName}
-                    <button class="delete-button" on:click={deleteFile}>
-                        Delete
-                    </button>
-                {/if}
-        </div>
+    <div class="input-wrapper">
+        <label for="detailLevel">Detail Level:</label>
+        <select id="detailLevel" bind:value={detailLevel}>
+            <option value="Basic">Basic</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+        </select>
+    </div>
 
-        <div class="input-wrapper">
-            <label for="detailLevel">Detail Level:</label>
-            <select id="detailLevel" bind:value={detailLevel}>
-                <option value="Basic">Basic</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
-            </select>
-        </div>
-    <button on:click={saveSettings}>Save Settings</button>
-</div>
+    <button class="save-button" on:click={saveSettings}>Save Settings</button>
 
-<div class="footer">
-        <button on:click={sendToBackend}>Generate Documentation</button>
+    <div class="footer">
+        <button class="generate-button" on:click={sendToBackend}>Generate Documentation</button>
     </div>
 </div>
