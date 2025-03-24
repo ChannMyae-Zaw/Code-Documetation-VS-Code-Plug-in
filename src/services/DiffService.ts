@@ -117,29 +117,6 @@ export class DiffService {
         await vscode.commands.executeCommand('setContext', 'code-documentation.showSecondarySidebar', true);
     }
 
-    /**private static async handleUserChoice(document: vscode.TextDocument, selection: vscode.Selection, modifiedCode: string) {
-        const result = await vscode.window.showQuickPick(['Accept', 'Reject'], {
-            placeHolder: 'Do you want to accept the changes?',
-            ignoreFocusOut: true
-        });
-
-        if (result === 'Accept') {
-            await this.applyChanges(document, selection, modifiedCode);
-        } else {
-            vscode.window.showInformationMessage("Code update rejected.");
-            
-        }
-        this.renamedSymbolsMap.clear();
-        await this.cleanup();
-    }
-
-    private static async applyChanges(document: vscode.TextDocument, selection: vscode.Selection, modifiedCode: string) {
-        const applyEdit = new vscode.WorkspaceEdit();
-        applyEdit.replace(document.uri, selection, modifiedCode);
-        await vscode.workspace.applyEdit(applyEdit);
-        vscode.window.showInformationMessage("Code updated successfully.");
-    }**/
-
     private static async checkIfFileExists(uri: vscode.Uri): Promise<boolean> {
         try {
             await vscode.workspace.fs.stat(uri);
@@ -170,7 +147,6 @@ export class DiffService {
     }
 
     private static async cleanup() {
-
-        
+      
     }
 }

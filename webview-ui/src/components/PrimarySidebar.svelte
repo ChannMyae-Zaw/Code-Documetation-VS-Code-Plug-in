@@ -77,7 +77,6 @@
         height: 95vh;
         padding: 0.5rem;
         border-radius: 10px;
-        background-color: var(--vscode-editor-background);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         overflow: hidden; 
     }
@@ -140,10 +139,11 @@
         width: 100%;
         background: linear-gradient(90deg, #4EA8DE, #80ED99);
         color: white;
+        opacity: 0.9;
     }
 
     .save-button:hover {
-        opacity: 0.8;
+        opacity: 1;
     }
 
     .footer {
@@ -152,12 +152,13 @@
 
     .generate-button {
         width: 100%;
-        background: #4EA8DE;
+        background: linear-gradient(90deg, #4EA8DE, #80ED99);
         color: white;
+        opacity: 0.9;
     }
 
     .generate-button:hover {
-        background: #3B82F6;
+        opacity: 1;
     }
 
     .file-upload-wrapper {
@@ -183,12 +184,8 @@
     }
 
     .delete-button {
-        background: #F44336;
+        background: var(--vscode-errorForeground);
         color: white;
-    }
-
-    .delete-button:hover {
-        background: #D32F2F;
     }
 
     .hidden-file-input {
