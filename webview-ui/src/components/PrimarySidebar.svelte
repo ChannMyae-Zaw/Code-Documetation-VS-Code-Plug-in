@@ -77,7 +77,7 @@
         height: 95vh;
         padding: 0.5rem;
         border-radius: 10px;
-        background-color: #1B263B;
+        background-color: var(--vscode-editor-background);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         overflow: hidden; 
     }
@@ -99,8 +99,8 @@
         margin-top: 0.2rem;
         border-radius: 5px;
         border: none;
-        background-color: #0D1B2A;
-        color: #E0E1DD;
+        background-color: var(--vscode-input-background);
+        color: var(--vscode-editor-foreground);;
         box-sizing: border-box;
     }
 
@@ -121,8 +121,8 @@
         padding: 0.6rem;
         border-radius: 5px;
         border: none;
-        background-color: #0D1B2A;
-        color: #E0E1DD;
+        background-color: var(--vscode-dropdown-background);
+        color: var(--vscode-editor-foreground);
     }
 
 
