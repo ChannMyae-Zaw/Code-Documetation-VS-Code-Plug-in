@@ -99,57 +99,64 @@ export class SecondarySidebar implements vscode.WebviewViewProvider {
             `;
         }
         private async applyChangesToFiles() {
-            const workspaceEdit = new vscode.WorkspaceEdit();
             const renamedSymbolsMap = DiffService.getRenamedSymbols();
-            console.log("Apply These Changes",renamedSymbolsMap)
+            console.log("Apply These Changes Using Rename", renamedSymbolsMap);
         
             if (renamedSymbolsMap.size === 0) {
                 vscode.window.showInformationMessage("No renamed symbols found.");
                 return;
             }
         
-            // Get all workspace files
-            const files = await vscode.workspace.findFiles("**/*.{ts,js,py,java,cpp}"); // Adjust file types as needed
+            for (const [oldSymbol, newSymbol] of renamedSymbolsMap.entries()) {
+                const oldName = oldSymbol.name;
+                const newName = newSymbol.name.replace(/[()]/g, '');
+                const position = oldSymbol.position; // Assuming this is a vscode.Position
+                const fileUri = oldSymbol.uri;       // Assuming this is a vscode.Uri
         
-            for (const fileUri of files) {
-                const doc = await vscode.workspace.openTextDocument(fileUri);
-                let text = doc.getText();
-                let newText = text;
-        
-                for (const [oldSymbol, newSymbol] of renamedSymbolsMap.entries()) {
-                    let oldName = oldSymbol.name;
-                    let newName = newSymbol.name;
-        
-                    if (!oldName || !newName || oldName === newName) continue;
-        
-                    // Remove parentheses if they exist in the stored names
-                    oldName = oldName.replace(/\(\)$/, '');
-                    newName = newName.replace(/\(\)$/, '');
-        
-                    // 1️⃣ Match standalone references (not followed by `(`)
-                    const referenceRegex = new RegExp(`\\b${oldName}\\b(?!\\s*\\()`, 'g');
-                    newText = newText.replace(referenceRegex, newName);
-        
-                    // 2️⃣ Match method calls (if it has `()`)
-                    const callRegex = new RegExp(`\\b${oldName}\\s*\\(\\)`, 'g');
-                    newText = newText.replace(callRegex, `${newName}()`);
+                if (!oldName || !newName || oldName === newName || !position || !fileUri) {
+                    console.warn(`Skipping invalid rename: ${oldName} -> ${newName}`);
+                    continue;
                 }
         
-                if (newText !== text) {
-                    const fullRange = new vscode.Range(
-                        doc.positionAt(0),
-                        doc.positionAt(text.length)
+                try {
+                    console.log("Changing the old name:", oldName);
+        
+                    // Execute the rename provider to get the WorkspaceEdit
+                    const workspaceEdit = await vscode.commands.executeCommand<vscode.WorkspaceEdit>(
+                        'vscode.executeDocumentRenameProvider',
+                        fileUri,  // URI of the file containing the symbol
+                        position, // Position of the symbol in the file
+                        newName   // New name to apply
                     );
         
-                    workspaceEdit.replace(fileUri, fullRange, newText);
+                    if (!workspaceEdit) {
+                        console.warn(`No changes proposed for renaming ${oldName} to ${newName}`);
+                        vscode.window.showWarningMessage(`No changes proposed for ${oldName} to ${newName}`);
+                        continue;
+                    }
+        
+                    // Apply the WorkspaceEdit to propagate the rename across the workspace
+                    const success = await vscode.workspace.applyEdit(workspaceEdit);
+                    if (success) {
+                        console.log(`Successfully renamed ${oldName} to ${newName}`);
+                    } else {
+                        console.error(`Failed to apply rename for ${oldName} to ${newName}`);
+                        vscode.window.showErrorMessage(`Failed to apply rename for ${oldName} to ${newName}`);
+                    }
+                } catch (error) {
+                    console.error(`Failed to rename ${oldName} to ${newName}:`, error);
+                    vscode.window.showErrorMessage(`Failed to rename ${oldName} to ${newName}: ${error}`);
                 }
             }
         
-            await vscode.workspace.applyEdit(workspaceEdit);
-            vscode.window.showInformationMessage("Applied changes across multiple files.");
+            // Save all modified files
+            await vscode.workspace.saveAll(false);
+            vscode.window.showInformationMessage("Attempted rename across multiple files.");
+        
+            // Execute post-rename commands
             await vscode.commands.executeCommand('setContext', 'code-documentation.showSecondarySidebar', false);
-            await vscode.commands.executeCommand('workbench.action.closeActiveEditor'); 
-        }          
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        }       
 
 
         private sendRenamedSymbols() {

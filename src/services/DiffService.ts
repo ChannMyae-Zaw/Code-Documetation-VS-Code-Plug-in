@@ -44,20 +44,13 @@ export class DiffService {
         
         await vscode.workspace.fs.writeFile(tempFileUri, Buffer.from(newContent, 'utf8'));
         const tempDoc = await vscode.workspace.openTextDocument(tempFileUri);
-        
-        console.log("Temp File Path:", tempFileUri.path);
         const fileExists = await this.checkIfFileExists(tempFileUri);
-        console.log("File exists:", fileExists);
-        console.log("Temp File Language:", tempDoc.languageId);
-        console.log("Temp File Content:", tempDoc.getText());
         
         const modifiedSymbols = await SymbolExtractor.getSymbols(tempDoc);
         console.log("Modified Symbols:", modifiedSymbols);
 
         // Compare and find renamed symbols
         this.renamedSymbolsMap = await this.findRenamedSymbols(originalSymbols, modifiedSymbols);
-        console.log("Renamed Symbols Map:", this.renamedSymbolsMap);
-        console.log("Keys:", Array.from(this.renamedSymbolsMap.keys()));
 
         await vscode.workspace.fs.delete(tempFileUri, { recursive: true});
 
@@ -80,8 +73,6 @@ export class DiffService {
 
             // If both symbols are non-null and have the same kind, check for renames
             if (origSymbol && modSymbol && origSymbol.kind === modSymbol.kind) {
-                console.log(`Comparing symbols: ${origSymbol.name} (Original) vs ${modSymbol.name} (Modified)`);
-
                 // If names are different, we consider it as renamed
                 if (origSymbol.name !== modSymbol.name) {
                     renamedMap.set(origSymbol, modSymbol);

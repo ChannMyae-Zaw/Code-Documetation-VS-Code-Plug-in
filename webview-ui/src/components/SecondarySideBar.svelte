@@ -70,7 +70,7 @@
                     <h2>{kind}s ({symbols.length})</h2>
                     <ul>
                         {#each symbols as {key, data}}
-                            <li class="symbol-item" on:click={() => onSymbolClick(key.line, data.line)}>
+                            <li class="symbol-item" on:click={() => onSymbolClick(key.range.start.line+1, data.range.start.line+1)}>
                                 <div class="symbol-header">
                                     <span class="old-name">{key.name}</span>
                                     <span class="arrow">→</span>
@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="symbol-details">
                                     <span class="kind-tag">{key.kind}</span>
-                                    <span class="line-number">Line {key.line}</span>
+                                    <span class="line-number">Line {key.range.start.line + 1}</span>
                                 </div>
                             </li>
                         {/each}
