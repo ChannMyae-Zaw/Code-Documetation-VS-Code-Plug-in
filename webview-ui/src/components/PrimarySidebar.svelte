@@ -5,6 +5,10 @@
     let fileName = '';
     let filePath = '';
     let detailLevel = 'Basic';
+    let transformOptions = {
+        renameVariables: false,
+        addComments: false
+    };
 
     const vscode = acquireVsCodeApi();
 
@@ -16,6 +20,8 @@
                 fileName = message.documentationFile || '';
                 filePath = message.documentationFilePath || '';
                 detailLevel = message.detailLevel || 'Basic';
+                transformOptions.renameVariables = message.renameVariables || false;
+                transformOptions.addComments = message.addComments || false;
             }
         });
 
@@ -54,12 +60,19 @@
             return;
         }
 
+        if (!transformOptions.renameVariables && !transformOptions.addComments) {
+            alert("Please select at least one documentation option.");
+            return;
+        }
+
         vscode.postMessage({
             type: 'saveSettings',
             apiKey,
             documentationFile: fileName,
             documentationFilePath: filePath,
-            detailLevel
+            detailLevel: transformOptions.addComments ? detailLevel : '',
+            renameVariables: transformOptions.renameVariables,
+            addComments: transformOptions.addComments
         });
     }
 </script>
@@ -80,7 +93,6 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         overflow: hidden; 
     }
-
 
     h2 {
         font-size: 1.8rem;
@@ -123,7 +135,6 @@
         background-color: var(--vscode-dropdown-background);
         color: var(--vscode-editor-foreground);
     }
-
 
     .upload-button, .delete-button, .save-button, .generate-button {
         padding: 0.7rem;
@@ -191,6 +202,25 @@
     .hidden-file-input {
         display: none;
     }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .checkbox-wrapper input {
+        margin: 0;
+        transform: translateY(2px); 
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+    width: auto;  
+    height: auto; 
+    margin: 0;    
+    }   
+
 </style>
 
 <div class="container">
@@ -216,13 +246,27 @@
     </div>
 
     <div class="input-wrapper">
-        <label for="detailLevel">Detail Level:</label>
+        <label>Documentation Options:</label>
+        <div class="checkbox-wrapper">
+            <input type="checkbox" id="renameVariables" bind:checked={transformOptions.renameVariables} />
+            <label for="renameVariables">Rename Variables</label>
+        </div>
+        <div class="checkbox-wrapper">
+            <input type="checkbox" id="addComments" bind:checked={transformOptions.addComments} />
+            <label for="addComments">Add Comments</label>
+        </div>
+    </div>
+
+    {#if transformOptions.addComments}
+    <div class="input-wrapper">
+        <label for="detailLevel">Comment Detail Level:</label>
         <select id="detailLevel" bind:value={detailLevel}>
             <option value="Basic">Basic</option>
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
         </select>
     </div>
+    {/if}
 
     <button class="save-button" on:click={saveSettings}>Save Settings</button>
 

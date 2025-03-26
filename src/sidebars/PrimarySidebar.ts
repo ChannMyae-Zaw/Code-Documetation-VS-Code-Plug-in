@@ -15,12 +15,15 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
             localResourceRoots: [vscode.Uri.file(this.context.extensionPath)]
         };
     
-        // Retrieve stored API key and file path
+        // Retrieve stored settings
         const apiKey = this.context.globalState.get<string>('apiKey') || '';
         const documentationFile = this.context.globalState.get<string>('documentationFile') || '';
         const documentationFilePath = this.context.globalState.get<string>('documentationFilePath') || '';
+        const detailLevel = this.context.globalState.get<string>('detailLevel') || 'Basic';
+        const renameVariables = this.context.globalState.get<boolean>('renameVariables') || false;
+        const addComments = this.context.globalState.get<boolean>('addComments') || false;
     
-        // Ensure the paths are correct
+        // Retrieve the HTML path
         const svelteAppUri = webviewView.webview.asWebviewUri(
             vscode.Uri.file(path.join(this.context.extensionPath, 'webview-ui', 'public', 'index.html'))
         );
@@ -45,7 +48,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         apiKey: this.context.globalState.get('apiKey'),
                         documentationFile: this.context.globalState.get('documentationFile'),
                         documentationFilePath: this.context.globalState.get('documentationFilePath'),
-                        detailLevel: this.context.globalState.get('detailLevel') || 'Basic'
+                        detailLevel: this.context.globalState.get('detailLevel') || 'Basic',
+                        renameVariables: this.context.globalState.get('renameVariables') || false,
+                        addComments: this.context.globalState.get('addComments') || false
                     });
                     break;
 
@@ -115,7 +120,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         await this.context.globalState.update('apiKey', message.apiKey);
                         await this.context.globalState.update('documentationFile', message.documentationFile);
                         await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
-                        await this.context.globalState.update('detailLevel', message.detailLevel); 
+                        await this.context.globalState.update('detailLevel', message.detailLevel);
+                        await this.context.globalState.update('renameVariables', message.renameVariables);
+                        await this.context.globalState.update('addComments', message.addComments);
 
                         const savedPath = this.context.globalState.get('documentationFilePath');
                         console.log("Saved documentation file path:", savedPath);
