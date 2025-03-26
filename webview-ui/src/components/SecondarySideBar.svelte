@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     
     let msg = "Changes Made To Your Source Code";
-    let renamedSymbols = { keys: [], data: [] };
+    let renamedSymbols = { keys: [], data: []};
     let isLoading = true;
 
     const vscode = acquireVsCodeApi();
@@ -39,6 +39,7 @@
         });
     }
     
+    // Group symbols by their kind; constants, methods, classes, etc.
     $: groupedSymbols = renamedSymbols.keys.reduce((acc, key, i) => {
         const kind = key.kind || 'Other';
         if (!acc[kind]) acc[kind] = [];
@@ -55,52 +56,46 @@
     {#if isLoading}
         <div class="loading">
             <div class="spinner"></div>
-            <p>Loading changes...</p>
+            <p>Loading renamed symbols...</p>
+        </div>
+    {:else if renamedSymbols.keys.length > 0}
+        <div class="content">
+            <div class="summary">
+                <div class="count">{renamedSymbols.keys.length}</div>
+                <p>symbols renamed</p>
+            </div>
+            
+            {#each Object.entries(groupedSymbols) as [kind, symbols]}
+                <div class="symbol-group">
+                    <h2>{kind}s ({symbols.length})</h2>
+                    <ul>
+                        {#each symbols as {key, data}}
+                            <li class="symbol-item" on:click={() => onSymbolClick(key.line, data.line)}>
+                                <div class="symbol-header">
+                                    <span class="old-name">{key.name}</span>
+                                    <span class="arrow">→</span>
+                                    <span class="new-name">{data.name}</span>
+                                </div>
+                                <div class="symbol-details">
+                                    <span class="kind-tag">{key.kind}</span>
+                                    <span class="line-number">Line {key.line}</span>
+                                </div>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+            {/each}
         </div>
     {:else}
-        <div class="content">
-            {#if renamedSymbols.keys.length > 0}
-                <div class="summary">
-                    <div class="count">{renamedSymbols.keys.length}</div>
-                    <p>symbols renamed</p>
-                </div>
-                
-                {#each Object.entries(groupedSymbols) as [kind, symbols]}
-                    <div class="symbol-group">
-                        <h2>{kind}s ({symbols.length})</h2>
-                        <ul>
-                            {#each symbols as {key, data}}
-                                <li class="symbol-item" on:click={() => onSymbolClick(key.line, data.line)}>
-                                    <div class="symbol-header">
-                                        <span class="old-name">{key.name}</span>
-                                        <span class="arrow">→</span>
-                                        <span class="new-name">{data.name}</span>
-                                    </div>
-                                    <div class="symbol-details">
-                                        <span class="kind-tag">{key.kind}</span>
-                                        <span class="line-number">Line {key.line}</span>
-                                    </div>
-                                </li>
-                            {/each}
-                        </ul>
-                    </div>
-                {/each}
-            {:else}
-                <div class="empty-state">
-                    <p>No renamed symbols detected.</p>
-                </div>
-            {/if}
+        <div class="empty-state">
+            <p>No renamed symbols detected.</p>
         </div>
     {/if}
     
-    {#if renamedSymbols.keys.length > 0}
-        <footer>
-            <div class="button-group">
-                <button class="apply-btn" on:click={applyChanges}>Accept Variable Changes</button>
-                <button class="reject-btn" on:click={rejectChanges}>Reject Variable Changes</button>
-            </div>
-        </footer>
-    {/if}
+    <footer>
+        <button class="apply-btn" on:click={applyChanges}>Apply Changes</button>
+        <button class="reject-btn" on:click={rejectChanges}>Reject Changes</button>
+    </footer>
 </div>
 
 <style>
@@ -215,17 +210,11 @@
     
     footer {
         display: flex;
-        flex-direction: column;
         padding: 15px;
         border-top: 1px solid var(--vscode-panel-border);
         gap: 10px;
     }
     
-    .button-group {
-        display: flex;
-        gap: 10px;
-    }
-
     button {
         padding: 8px 16px;
         border-radius: 4px;
@@ -233,7 +222,6 @@
         cursor: pointer;
         border: none;
         flex: 1;
-        min-width: 120px;
     }
     
     .apply-btn {
