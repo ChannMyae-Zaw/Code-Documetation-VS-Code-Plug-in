@@ -5,6 +5,7 @@
     let fileName = '';
     let filePath = '';
     let detailLevel = 'Basic';
+    let featureType = 'Comments'; 
 
     const vscode = acquireVsCodeApi();
 
@@ -16,6 +17,7 @@
                 fileName = message.documentationFile || '';
                 filePath = message.documentationFilePath || '';
                 detailLevel = message.detailLevel || 'Basic';
+                featureType = message.featureType || 'Comments';
             }
         });
 
@@ -23,7 +25,10 @@
     });
 
     function sendToBackend() {
-        vscode.postMessage({ type: 'sendToBackend' });
+        vscode.postMessage({ 
+            type: 'sendToBackend',
+            featureType: featureType
+        });
     }
 
     async function handleFileUpload(event) {
@@ -59,7 +64,8 @@
             apiKey,
             documentationFile: fileName,
             documentationFilePath: filePath,
-            detailLevel
+            detailLevel,
+            featureType
         });
     }
 </script>
@@ -214,19 +220,38 @@
             <input id="fileInput" class="hidden-file-input" type="file" accept=".pdf" on:change={handleFileUpload} />
         </div>
     </div>
+    
+    <div class="input-wrapper">
+        <label for="featureType">Feature Type:</label>
+        <select id="featureType" bind:value={featureType}>
+            <option value="Rename">Change Variable Names</option>
+            <option value="Comments">Generate Comments</option>
+            <option value="Both">Both</option>
+        </select>
+    </div>
 
     <div class="input-wrapper">
-        <label for="detailLevel">Detail Level:</label>
-        <select id="detailLevel" bind:value={detailLevel}>
-            <option value="Basic">Basic</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-        </select>
+        {#if featureType !== 'Rename'}
+            <label for="detailLevel">Detail Level:</label>
+            <select id="detailLevel" bind:value={detailLevel} disabled={featureType === 'Rename'}>
+                <option value="Basic">Basic</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+        {/if}
     </div>
 
     <button class="save-button" on:click={saveSettings}>Save Settings</button>
 
     <div class="footer">
-        <button class="generate-button" on:click={sendToBackend}>Generate Documentation</button>
+        <button class="generate-button" on:click={sendToBackend}>
+            {#if featureType === 'Comments'}
+                Generate Comments
+            {:else if featureType === 'Rename'}
+                Change Variable Names
+            {:else}
+                Generate Documentation
+            {/if}
+        </button>
     </div>
 </div>
