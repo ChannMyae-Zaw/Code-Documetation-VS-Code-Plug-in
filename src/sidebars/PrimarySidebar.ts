@@ -19,6 +19,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
         const apiKey = this.context.globalState.get<string>('apiKey') || '';
         const documentationFile = this.context.globalState.get<string>('documentationFile') || '';
         const documentationFilePath = this.context.globalState.get<string>('documentationFilePath') || '';
+        const featureType = this.context.globalState.get<string>('featureType') || 'Comments';
     
         // Ensure the paths are correct
         const svelteAppUri = webviewView.webview.asWebviewUri(
@@ -45,7 +46,8 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         apiKey: this.context.globalState.get('apiKey'),
                         documentationFile: this.context.globalState.get('documentationFile'),
                         documentationFilePath: this.context.globalState.get('documentationFilePath'),
-                        detailLevel: this.context.globalState.get('detailLevel') || 'Basic'
+                        detailLevel: this.context.globalState.get('detailLevel') || 'Basic',
+                        featureType: this.context.globalState.get('featureType') || 'Comments'
                     });
                     break;
 
@@ -69,7 +71,8 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                             type: 'loadSettings',
                             apiKey: this.context.globalState.get('apiKey'),
                             documentationFile: message.fileName,
-                            documentationFilePath: filePath
+                            documentationFilePath: filePath,
+                            featureType: this.context.globalState.get('featureType')
                         });
     
                         vscode.window.showInformationMessage(`File saved successfully: ${message.fileName}`);
@@ -95,7 +98,8 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                                 type: 'loadSettings',
                                 apiKey: this.context.globalState.get('apiKey'),
                                 documentationFile: '',
-                                documentationFilePath: ''
+                                documentationFilePath: '',
+                                featureType: this.context.globalState.get('featureType')
                             });
                             
                             vscode.window.showInformationMessage('File deleted successfully');
@@ -116,6 +120,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         await this.context.globalState.update('documentationFile', message.documentationFile);
                         await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
                         await this.context.globalState.update('detailLevel', message.detailLevel); 
+                        await this.context.globalState.update('featureType', message.featureType);
 
                         const savedPath = this.context.globalState.get('documentationFilePath');
                         console.log("Saved documentation file path:", savedPath);
@@ -135,7 +140,9 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                     }
                     break;
                 case 'sendToBackend':
-                    vscode.commands.executeCommand('code-documentation.sendToBackend');
+                    vscode.commands.executeCommand('code-documentation.sendToBackend', {
+                        featureType: message.featureType
+                    });
                     break;
             }
         });

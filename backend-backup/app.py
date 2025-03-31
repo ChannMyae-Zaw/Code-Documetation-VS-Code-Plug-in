@@ -34,11 +34,17 @@ def chat_with_file():
         if detail_level not in valid_levels:
             detail_level = 'basic'  # Default to basic if invalid
 
+        # Retrieve feature type
+        feature_type = request.form.get('featureType', 'comments').strip().lower()
+        valid_features = {'comments', 'rename', 'both'}
+        if feature_type not in valid_features:
+            feature_type = 'comments'  # Default to comments if invalid
+
         # Optional: Retrieve and process the uploaded file
         extracted_text = process_uploaded_file(request.files.get('file'))
 
         # Combine the extracted text (if any) with the user prompt
-        combined_prompt = create_combined_prompt(extracted_text, prompt, detail_level)
+        combined_prompt = create_combined_prompt(extracted_text, prompt, detail_level, feature_type)
 
         # Send the combined prompt to the OpenAI API
         response_content = get_openai_response(combined_prompt, user_api_key)
@@ -68,22 +74,37 @@ def process_uploaded_file(file):
         return ""
 
 
-def create_combined_prompt(extracted_text, user_prompt, detail_level):
+def create_combined_prompt(extracted_text, user_prompt, detail_level, feature_type):
+    # Different instructions based on feature type
+    if feature_type == 'comments':
+        return create_comment_prompt(extracted_text, user_prompt, detail_level)
+    elif feature_type == 'rename':
+        return create_rename_prompt(extracted_text, user_prompt)
+    elif feature_type == 'both':
+        # For "both" mode, default to comments in the initial call
+        return create_comment_prompt(extracted_text, user_prompt, detail_level)
+    else:
+        # Default case
+        return create_comment_prompt(extracted_text, user_prompt, detail_level)
+
+
+def create_comment_prompt(extracted_text, user_prompt, detail_level):
     detail_prompts = {
         "basic": "with very brief documentation with short inline comments together in the code.",
-        "intermediate": "with detailed documentation with function explanations, parameters, and return values as comments",
-        "advanced": "with a full, structured documentation including inline comments, function descriptions, examples, and possible optimizations as comments"
+        "intermediate": "with detailed documentation with function explanations, parameters, and return values as block comments",
+        "advanced": "with a full, structured documentation with function descriptions, examples, and possible optimizations as block comments"
     }
 
     instruction = detail_prompts.get(detail_level, detail_prompts["basic"])
 
-    template = """Generate the corrected code following this following coding standard ,{instruction}.
+    template = """Generate the corrected code following this coding standard, {instruction}.
    
 {coding_standard}
 
-Here is the code to fix:
+Here is the code to update with proper comments:
 {user_code}
-Only generate the code output with no conversation.
+
+Only generate the code output with no conversation. Keep variable names and logic exactly the same, only add appropriate comments.
 """
 
     coding_standard = f"Here is the coding standard:\n{extracted_text} which should be followed strictly" if extracted_text else ""
@@ -94,6 +115,28 @@ Only generate the code output with no conversation.
     )
 
     return prompt.format(instruction=instruction, coding_standard=coding_standard, user_code=user_prompt)
+
+
+def create_rename_prompt(extracted_text, user_prompt):
+    template = """Generate the corrected code following this coding standard, focusing ONLY on renaming variables, methods, and classes.
+   
+{coding_standard}
+
+Here is the code to update with better variable, method, and class names:
+{user_code}
+
+Only generate the code output with no conversation. DO NOT add or change comments, only rename variables, methods, and classes to follow naming conventions.
+Keep the logic and structure exactly the same, just rename identifiers to be more clear and follow best practices.
+"""
+
+    coding_standard = f"Here is the coding standard for naming:\n{extracted_text} which should be followed strictly" if extracted_text else ""
+
+    prompt = PromptTemplate(
+        input_variables=["coding_standard", "user_code"],
+        template=template
+    )
+
+    return prompt.format(coding_standard=coding_standard, user_code=user_prompt)
 
 
 def extract_pdf_text(pdf_file):
