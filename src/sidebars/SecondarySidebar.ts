@@ -58,7 +58,7 @@ export class SecondarySidebar implements vscode.WebviewViewProvider {
                         Object.keys(this.changes.classes).length + 
                         Object.keys(this.changes.methods).length;
                     
-                        this.applyChangesToFiles();
+                        this.applyChangesToFiles(message.selectedIndexes);
                 break;
 
                 case 'rejectChanges' :
@@ -98,7 +98,7 @@ export class SecondarySidebar implements vscode.WebviewViewProvider {
                 </html>
             `;
         }
-        private async applyChangesToFiles() {
+        private async applyChangesToFiles(selectedIndexes: number[]) {
             const renamedSymbolsMap = DiffService.getRenamedSymbols();
             console.log("Apply These Changes Using Rename", renamedSymbolsMap);
         
@@ -106,8 +106,23 @@ export class SecondarySidebar implements vscode.WebviewViewProvider {
                 vscode.window.showInformationMessage("No renamed symbols found.");
                 return;
             }
+
+            const renamedSymbolsKeys = Array.from(renamedSymbolsMap.keys());
+            const renamedSymbolsArray = Array.from(renamedSymbolsMap.values());
         
-            for (const [oldSymbol, newSymbol] of renamedSymbolsMap.entries()) {
+            // 선택된 인덱스에 해당하는 심볼만 필터링
+            const filteredChanges = selectedIndexes.map(index => ({
+                oldSymbol: renamedSymbolsKeys[index],
+                newSymbol: renamedSymbolsArray[index]
+            }));
+        
+            if (filteredChanges.length === 0) {
+                vscode.window.showInformationMessage("No selected symbols to rename.");
+                return;
+            }
+           
+            
+            for (const { oldSymbol, newSymbol } of filteredChanges) {
                 const oldName = oldSymbol.name;
                 const newName = newSymbol.name.replace(/[()]/g, '');
                 const position = oldSymbol.position; // Assuming this is a vscode.Position

@@ -4,6 +4,7 @@
     let msg = "Changes Made To Your Source Code";
     let renamedSymbols = { keys: [], data: []};
     let isLoading = true;
+    let selectedIndexes= [];
 
     const vscode = acquireVsCodeApi();
 
@@ -21,7 +22,7 @@
 
     function applyChanges() {
         if (vscode) {
-            vscode.postMessage({ type: "applyChanges" });
+            vscode.postMessage({ type: "applyChanges", selectedIndexes });
         }
     }
 
@@ -31,7 +32,24 @@
         }
     }
 
+    function toggleSelection(index) {
+        if (selectedIndexes.includes(index)) {
+            selectedIndexes = selectedIndexes.filter(i => i !== index);
+        } else {
+            selectedIndexes = [...selectedIndexes, index];
+        }
+    }
+
+    function toggleSelectAll(event) {
+        if (event.target.checked) {
+            selectedIndexes = renamedSymbols.keys.map((_, i) => i);
+        } else {
+            selectedIndexes = [];
+        }
+    }
+
     function onSymbolClick(originalLine, modifiedLine) {
+        //console.log("you pressed this index: ", index);
         vscode.postMessage({
             type: 'scrollToLineInDiffView',
             originalLineNumber: originalLine,
@@ -43,7 +61,7 @@
     $: groupedSymbols = renamedSymbols.keys.reduce((acc, key, i) => {
         const kind = key.kind || 'Other';
         if (!acc[kind]) acc[kind] = [];
-        acc[kind].push({ key, data: renamedSymbols.data[i] });
+        acc[kind].push({ key, data: renamedSymbols.data[i], index: i });
         return acc;
     }, {});
 </script>
@@ -61,6 +79,7 @@
     {:else if renamedSymbols.keys.length > 0}
         <div class="content">
             <div class="summary">
+                <input type="checkbox" on:change={toggleSelectAll} checked={selectedIndexes.length === renamedSymbols.keys.length} />
                 <div class="count">{renamedSymbols.keys.length}</div>
                 <p>symbols renamed</p>
             </div>
@@ -69,8 +88,9 @@
                 <div class="symbol-group">
                     <h2>{kind}s ({symbols.length})</h2>
                     <ul>
-                        {#each symbols as {key, data}}
+                        {#each symbols as {key, data, index}}
                             <li class="symbol-item" on:click={() => onSymbolClick(key.range.start.line+1, data.range.start.line+1)}>
+                                <input type="checkbox" on:change={() => toggleSelection(index)} checked={selectedIndexes.includes(index)} />
                                 <div class="symbol-header">
                                     <span class="old-name">{key.name}</span>
                                     <span class="arrow">→</span>

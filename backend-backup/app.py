@@ -90,16 +90,14 @@ def create_combined_prompt(extracted_text, user_prompt, detail_level, feature_ty
 
 def create_comment_prompt(extracted_text, user_prompt, detail_level):
     detail_prompts = {
-        "basic": "with very brief documentation with short inline comments together in the code.",
-        "intermediate": "with detailed documentation with function explanations, parameters, and return values as block comments",
-        "advanced": "with a full, structured documentation with function descriptions, examples, and possible optimizations as block comments"
+        "basic": " very brief documentation with short inline comments together in the code.",
+        "intermediate": " detailed documentation with function explanations, parameters, and return values as block comments",
+        "advanced": " a full, structured documentation with function descriptions, examples, and possible optimizations as block comments"
     }
 
     instruction = detail_prompts.get(detail_level, detail_prompts["basic"])
 
-    template = """Generate the corrected code following this coding standard, {instruction}.
-   
-{coding_standard}
+    template = """Generate{instruction}.
 
 Here is the code to update with proper comments:
 {user_code}
@@ -110,11 +108,11 @@ Only generate the code output with no conversation. Keep variable names and logi
     coding_standard = f"Here is the coding standard:\n{extracted_text} which should be followed strictly" if extracted_text else ""
 
     prompt = PromptTemplate(
-        input_variables=["instruction", "coding_standard", "user_code"],
+        input_variables=["instruction", "user_code"],
         template=template
     )
 
-    return prompt.format(instruction=instruction, coding_standard=coding_standard, user_code=user_prompt)
+    return prompt.format(instruction=instruction, user_code=user_prompt)
 
 
 def create_rename_prompt(extracted_text, user_prompt):
