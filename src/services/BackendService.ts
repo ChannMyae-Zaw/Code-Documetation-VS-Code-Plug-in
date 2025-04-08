@@ -42,7 +42,7 @@ export class BackendService {
             formData.append('detailLevel', detailLevel);
             formData.append('featureType', featureType);
 
-            const response = await axios.post('http://localhost:5000/api/chat', formData, {
+            const response = await axios.post('https://backend-vs-plug-in.onrender.com/api/chat', formData, {
                 headers: formData.getHeaders(),
             });
 
@@ -90,7 +90,7 @@ export class BackendService {
         formData.append('featureType', 'Rename'); 
 
         try {
-            const response = await axios.post('http://localhost:5000/api/chat', formData, {
+            const response = await axios.post('https://backend-vs-plug-in.onrender.com/api/chat', formData, {
                 headers: formData.getHeaders(),
             });
 
