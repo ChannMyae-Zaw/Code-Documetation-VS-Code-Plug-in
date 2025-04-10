@@ -117,8 +117,8 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                 case 'saveSettings':
                     try {
                         await this.context.globalState.update('apiKey', message.apiKey);
-                        await this.context.globalState.update('documentationFile', message.documentationFile);
-                        await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
+                        //await this.context.globalState.update('documentationFile', message.documentationFile);
+                        //await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
                         await this.context.globalState.update('detailLevel', message.detailLevel); 
                         await this.context.globalState.update('featureType', message.featureType);
 

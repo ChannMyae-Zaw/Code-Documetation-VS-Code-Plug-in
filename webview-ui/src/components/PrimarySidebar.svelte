@@ -62,8 +62,6 @@
         vscode.postMessage({
             type: 'saveSettings',
             apiKey,
-            documentationFile: fileName,
-            documentationFilePath: filePath,
             detailLevel,
             featureType
         });
@@ -204,7 +202,7 @@
 
     <div class="input-wrapper">
         <label for="apiKey">OpenAI API Key:</label>
-        <input id="apiKey" bind:value={apiKey} placeholder="Enter your API key" />
+        <input id="apiKey" bind:value={apiKey} placeholder="Enter your API key" on:change={saveSettings} />
     </div>
 
     <div class="input-wrapper">
@@ -223,7 +221,7 @@
     
     <div class="input-wrapper">
         <label for="featureType">Feature Type:</label>
-        <select id="featureType" bind:value={featureType}>
+        <select id="featureType" bind:value={featureType} on:change={saveSettings}>
             <option value="Rename">Change Variable Names</option>
             <option value="Comments">Generate Comments</option>
             <option value="Both">Both</option>
@@ -233,15 +231,13 @@
     <div class="input-wrapper">
         {#if featureType !== 'Rename'}
             <label for="detailLevel">Detail Level:</label>
-            <select id="detailLevel" bind:value={detailLevel} disabled={featureType === 'Rename'}>
+            <select id="detailLevel" bind:value={detailLevel} on:change={saveSettings} disabled={featureType === 'Rename'}>
                 <option value="Basic">Basic</option>
                 <option value="Intermediate">Intermediate</option>
                 <option value="Advanced">Advanced</option>
             </select>
         {/if}
     </div>
-
-    <button class="save-button" on:click={saveSettings}>Save Settings</button>
 
     <div class="footer">
         <button class="generate-button" on:click={sendToBackend}>
