@@ -80,7 +80,6 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "axios": "^1.7.9",
-    "code-documentation": "file:"
+    "axios": "^1.7.9"
   }
 }
