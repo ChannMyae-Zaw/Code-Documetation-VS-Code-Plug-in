@@ -2,6 +2,7 @@
   "name": "code-documentation",
   "displayName": "Athena Code Documentation",
   "description": "",
+  "icon": "src/resources/icon.png",
   "version": "1.0.0",
   "publisher": "FoodokuAthena",
   "engines": {
