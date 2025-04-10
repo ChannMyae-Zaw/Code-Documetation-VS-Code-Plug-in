@@ -1,8 +1,9 @@
 {
   "name": "code-documentation",
-  "displayName": "Code Documentation",
+  "displayName": "Athena Code Documentation",
   "description": "",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "publisher": "Foodoku Athena",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -45,18 +46,17 @@
     },
     "views": {
       "code-documentation": [
-          {   
-              "type": "webview",
-              "id": "code-documentation.primarySidebar",
-              "name": "Primary Sidebar"
-          },
-          {
-              "type": "webview",
-              "id": "code-documentation.secondarySidebar",
-              "name": "Secondary Sidebar",
-              "when": "code-documentation.showSecondarySidebar"
-              
-          }
+        {
+          "type": "webview",
+          "id": "code-documentation.primarySidebar",
+          "name": "Primary Sidebar"
+        },
+        {
+          "type": "webview",
+          "id": "code-documentation.secondarySidebar",
+          "name": "Secondary Sidebar",
+          "when": "code-documentation.showSecondarySidebar"
+        }
       ]
     }
   },

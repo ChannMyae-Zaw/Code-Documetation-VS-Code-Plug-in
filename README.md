@@ -25,3 +25,8 @@ An Open AI API key
 ## Backend Info
 
 The backend server (powered by Python/Flask) is already hosted. No setup is needed from your side — it connects automatically.
+
+## Support
+
+For questions, feedback, or support, please contact:
+📧 athenacode65@gmail.com
