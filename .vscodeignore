@@ -1,12 +1,23 @@
+# Ignore dev and test tools
 .vscode/**
 .vscode-test/**
-src/**
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
+
+# Ignore TypeScript source maps and config
+**/*.ts
+**/*.map
 **/tsconfig.json
 **/eslint.config.mjs
-**/*.map
-**/*.ts
+
+# Ignore test-related files
 **/.vscode-test.*
-webview-ui/node_modules/svelte-app
+
+# Ignore unnecessary webview build/dependencies
+webview-ui/node_modules/**
+webview-ui/package.json
+webview-ui/package-lock.json
+webview-ui/rollup.config.js
+webview-ui/src/**
+webview-ui/public/build/**/*.map  # optional, if using SvelteKit or similar
