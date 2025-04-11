@@ -14,6 +14,9 @@ vsc-extension-quickstart.md
 # Ignore test-related files
 **/.vscode-test.*
 
+# Exclude icons
+!src/resources/icon.*
+
 # Ignore unnecessary webview build/dependencies
 webview-ui/node_modules/**
 webview-ui/package.json
