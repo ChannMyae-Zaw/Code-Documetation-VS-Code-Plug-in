@@ -16,6 +16,9 @@ export class BackendService {
         if (!code) return;
 
         // Get settings from globalState!!!
+        // Define default documentation file path
+        const defaultDocPath = context.asAbsolutePath('src/resources/default_documentation.pdf');
+
         const apiKey = context.globalState.get<string>('apiKey');
         const documentationFilePath = context.globalState.get<string>('documentationFilePath');
         const detailLevel = context.globalState.get<string>('detailLevel') || 'Basic';
@@ -27,16 +30,22 @@ export class BackendService {
         }
 
         // Verify file exists
-        if (!documentationFilePath || !fs.existsSync(documentationFilePath)) {
-            vscode.window.showErrorMessage("Documentation file not found. Please upload a file in the Primary Sidebar.");
-            return;
+        let docPathToUse = documentationFilePath;
+        if (!docPathToUse || !fs.existsSync(docPathToUse)) {
+            if (fs.existsSync(defaultDocPath)) {
+                docPathToUse = defaultDocPath;
+                vscode.window.showInformationMessage("Using default documentation file.");
+            } else {
+                vscode.window.showErrorMessage("No documentation file found. Please upload one or ensure the default file exists.");
+                return;
+            }
         }
 
         // Prepare request data
         const formData = new FormData();
         try {
             // Use the correct file path from globalState
-            formData.append('file', fs.createReadStream(documentationFilePath), path.basename(documentationFilePath));
+            formData.append('file', fs.createReadStream(docPathToUse), path.basename(docPathToUse));
             formData.append('prompt', code);
             formData.append('apiKey', apiKey);
             formData.append('detailLevel', detailLevel);
@@ -57,7 +66,7 @@ export class BackendService {
                         break;
                     case 'Both':
                         await CommentService.processCommentGeneration(response.data.response);
-                        await this.handleBothFeatures(context, code, apiKey, documentationFilePath, detailLevel);
+                        await this.handleBothFeatures(context, code, apiKey, docPathToUse, detailLevel);
                         break;
                     default:
                         vscode.window.showErrorMessage(`Unknown feature type: ${featureType}`);
@@ -67,7 +76,7 @@ export class BackendService {
             }
         } catch (error: any) {
             if (error.code === 'ENOENT') {
-                vscode.window.showErrorMessage(`File not found: ${documentationFilePath}`);
+                vscode.window.showErrorMessage(`File not found: ${docPathToUse}`);
             } else {
                 vscode.window.showErrorMessage(`Error: ${error.message}`);
             }

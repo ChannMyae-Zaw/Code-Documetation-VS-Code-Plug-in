@@ -217,7 +217,11 @@
             {/if}
             <input id="fileInput" class="hidden-file-input" type="file" accept=".pdf" on:change={handleFileUpload} />
         </div>
+        {#if !fileName}
+            <div style="color:aquamarine">**Our default documentation will be used</div>
+        {/if}
     </div>
+
     
     <div class="input-wrapper">
         <label for="featureType">Feature Type:</label>
