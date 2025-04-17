@@ -3,7 +3,7 @@
   "displayName": "Athena Code Documentation",
   "description": "",
   "icon": "src/resources/icon.png",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "FoodokuAthena",
   "engines": {
     "vscode": "^1.96.0"
