@@ -78,11 +78,12 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        height: 95vh;
+        min-height: 95vh;
         padding: 0.5rem;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         overflow: hidden; 
+        overflow-y: auto;
     }
 
 
