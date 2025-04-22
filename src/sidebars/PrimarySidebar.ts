@@ -17,6 +17,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
     
         // Retrieve stored API key and file path
         const apiKey = this.context.globalState.get<string>('apiKey') || '';
+        const apiKeyType = this.context.globalState.get<string>('apiKeyType') || 'OpenAI'; 
         const documentationFile = this.context.globalState.get<string>('documentationFile') || '';
         const documentationFilePath = this.context.globalState.get<string>('documentationFilePath') || '';
         const featureType = this.context.globalState.get<string>('featureType') || 'Comments';
@@ -44,6 +45,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                     webviewView.webview.postMessage({
                         type: 'loadSettings',
                         apiKey: this.context.globalState.get('apiKey'),
+                        apiKeyType: this.context.globalState.get('apiKeyType') || 'OpenAI', 
                         documentationFile: this.context.globalState.get('documentationFile'),
                         documentationFilePath: this.context.globalState.get('documentationFilePath'),
                         detailLevel: this.context.globalState.get('detailLevel') || 'Basic',
@@ -70,6 +72,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                         webviewView.webview.postMessage({
                             type: 'loadSettings',
                             apiKey: this.context.globalState.get('apiKey'),
+                            apiKeyType: this.context.globalState.get('apiKeyType'),
                             documentationFile: message.fileName,
                             documentationFilePath: filePath,
                             featureType: this.context.globalState.get('featureType')
@@ -97,6 +100,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                             webviewView.webview.postMessage({
                                 type: 'loadSettings',
                                 apiKey: this.context.globalState.get('apiKey'),
+                                apiKeyType: this.context.globalState.get('apiKeyType'),
                                 documentationFile: '',
                                 documentationFilePath: '',
                                 featureType: this.context.globalState.get('featureType')
@@ -117,8 +121,7 @@ export class PrimarySidebar implements vscode.WebviewViewProvider {
                 case 'saveSettings':
                     try {
                         await this.context.globalState.update('apiKey', message.apiKey);
-                        //await this.context.globalState.update('documentationFile', message.documentationFile);
-                        //await this.context.globalState.update('documentationFilePath', message.documentationFilePath);
+                        await this.context.globalState.update('apiKeyType', message.apiKeyType); 
                         await this.context.globalState.update('detailLevel', message.detailLevel); 
                         await this.context.globalState.update('featureType', message.featureType);
 

@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     let apiKey = '';
+    let apiKeyType = 'OpenAI'; 
     let file = null;
     let fileName = '';
     let filePath = '';
@@ -14,6 +15,7 @@
             const message = event.data;
             if (message.type === 'loadSettings') {
                 apiKey = message.apiKey || '';
+                apiKeyType = message.apiKeyType || 'OpenAI'; 
                 fileName = message.documentationFile || '';
                 filePath = message.documentationFilePath || '';
                 detailLevel = message.detailLevel || 'Basic';
@@ -62,6 +64,7 @@
         vscode.postMessage({
             type: 'saveSettings',
             apiKey,
+            apiKeyType, // Add API key type to the saved settings
             detailLevel,
             featureType
         });
@@ -91,7 +94,7 @@
         font-size: 1.8rem;
         font-weight: bold;
         background: linear-gradient(90deg, #4EA8DE, #80ED99);
-        -webkit-background-clip: text;
+        -webkit-background-clip: text;  
         -webkit-text-fill-color: transparent;
         text-align: center;
         margin-bottom: 1.5rem;
@@ -202,8 +205,17 @@
     <h2>Athena Settings</h2>
 
     <div class="input-wrapper">
-        <label for="apiKey">OpenAI API Key:</label>
-        <input id="apiKey" bind:value={apiKey} placeholder="Enter your API key" on:change={saveSettings} />
+        <label for="apiKeyType">API Provider:</label>
+        <select id="apiKeyType" bind:value={apiKeyType} on:change={saveSettings}>
+            <option value="OpenAI">OpenAI</option>
+            <option value="Gemini">Google Gemini</option>
+            <option value="DeepSeek">DeepSeek</option>
+        </select>
+    </div>
+
+    <div class="input-wrapper">
+        <label for="apiKey">{apiKeyType} API Key:</label>
+        <input id="apiKey" bind:value={apiKey} placeholder={`Enter your ${apiKeyType} API key`} on:change={saveSettings} />
     </div>
 
     <div class="input-wrapper">

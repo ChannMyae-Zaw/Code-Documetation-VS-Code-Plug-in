@@ -20,6 +20,7 @@ export class BackendService {
         const defaultDocPath = context.asAbsolutePath('src/resources/default_documentation.pdf');
 
         const apiKey = context.globalState.get<string>('apiKey');
+        const apiKeyType = context.globalState.get<string>('apiKeyType') || 'OpenAI'; 
         const documentationFilePath = context.globalState.get<string>('documentationFilePath');
         const detailLevel = context.globalState.get<string>('detailLevel') || 'Basic';
         const featureType = args?.featureType || context.globalState.get<string>('featureType') || 'Comments';
@@ -48,6 +49,7 @@ export class BackendService {
             formData.append('file', fs.createReadStream(docPathToUse), path.basename(docPathToUse));
             formData.append('prompt', code);
             formData.append('apiKey', apiKey);
+            formData.append('apiKeyType', apiKeyType); 
             formData.append('detailLevel', detailLevel);
             formData.append('featureType', featureType);
 
@@ -66,7 +68,7 @@ export class BackendService {
                         break;
                     case 'Both':
                         await CommentService.processCommentGeneration(response.data.response);
-                        await this.handleBothFeatures(context, code, apiKey, docPathToUse, detailLevel);
+                        await this.handleBothFeatures(context, code, apiKey, apiKeyType, docPathToUse, detailLevel);
                         break;
                     default:
                         vscode.window.showErrorMessage(`Unknown feature type: ${featureType}`);
@@ -87,7 +89,8 @@ export class BackendService {
     private static async handleBothFeatures(
         context: vscode.ExtensionContext, 
         code: string, 
-        apiKey: string, 
+        apiKey: string,
+        apiKeyType: string, 
         documentationFilePath: string,
         detailLevel: string
     ) {
@@ -95,6 +98,7 @@ export class BackendService {
         formData.append('file', fs.createReadStream(documentationFilePath), path.basename(documentationFilePath));
         formData.append('prompt', code);
         formData.append('apiKey', apiKey);
+        formData.append('apiKeyType', apiKeyType); 
         formData.append('detailLevel', detailLevel);
         formData.append('featureType', 'Rename'); 
 
