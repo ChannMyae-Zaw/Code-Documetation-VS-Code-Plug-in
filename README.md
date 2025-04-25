@@ -16,13 +16,17 @@ A VS Code extension that helps you automatically document your code using AI. Hi
 
 ## Requirements
 
-An Open AI API key
+OpenAI/ Gemini/ DeepSeek(OpenRouter) API KEY
 
 ## Release Notes
 
 1.0.0 - Initial release of Athena, compactible with OpenAI
+
 1.0.1 - Added a standard documentation for the users
-1.0.2 - slight UI change
+
+1.0.2 - Slight UI change
+
+1.0.3 - Now compatible with OpenAI, Gemini, and DeepSeek(OpenRouter)
 
 ## Backend Info
 
