@@ -209,7 +209,7 @@
         <select id="apiKeyType" bind:value={apiKeyType} on:change={saveSettings}>
             <option value="OpenAI">OpenAI</option>
             <option value="Gemini">Google Gemini</option>
-            <option value="DeepSeek">DeepSeek</option>
+            <option value="DeepSeek">DeepSeek (OpenRouter)</option>
         </select>
     </div>
 
@@ -241,7 +241,6 @@
         <select id="featureType" bind:value={featureType} on:change={saveSettings}>
             <option value="Rename">Change Variable Names</option>
             <option value="Comments">Generate Comments</option>
-            <option value="Both">Both</option>
         </select>
     </div>
 

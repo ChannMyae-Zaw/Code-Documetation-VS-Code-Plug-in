@@ -66,10 +66,6 @@ export class BackendService {
                     case 'Rename':
                         await DiffService.processResponse(response.data.response);
                         break;
-                    case 'Both':
-                        await CommentService.processCommentGeneration(response.data.response);
-                        await this.handleBothFeatures(context, code, apiKey, apiKeyType, docPathToUse, detailLevel);
-                        break;
                     default:
                         vscode.window.showErrorMessage(`Unknown feature type: ${featureType}`);
                 }
