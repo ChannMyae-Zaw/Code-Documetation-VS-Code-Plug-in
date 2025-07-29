@@ -2,6 +2,8 @@
 
 A VS Code extension that helps you automatically document your code using AI. Highlight your code, attach a coding standard, and generate detailed, readability-enhanced documentation — all without leaving your editor.
 
+[See the product here!](https://marketplace.visualstudio.com/items?itemName=FoodokuAthena.code-documentation#:~:text=A%20VS%20Code%20extension%20that%20helps%20you%20automatically,%F0%9F%93%84%20Attach%20your%20coding%20standard%20%28PDF%29%2C%20or%20not%21)
+
 ## Features
 
 🧠 AI-generated documentation for your selected code
